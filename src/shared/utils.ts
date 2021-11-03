@@ -1,4 +1,4 @@
-import { relative, join } from "path";
+import { join, relative } from "path";
 import Serverless from "serverless";
 import { ServerlessAzureConfig, ServerlessAzureFunctionConfig } from "../models/serverless";
 import { BindingUtils } from "./bindings";
@@ -130,8 +130,10 @@ export class Utils {
 
     const entryPoint = (handlerSplit.length > 1) ? handlerSplit[handlerSplit.length - 1] : undefined;
 
-    const handlerPath = ((handlerSplit.length > 1) ? handlerSplit[0] : handler) 
-      + constants.runtimeExtensions[getRuntimeLanguage(config.provider.runtime)]
+    const runtimeExtensions = config["custom"]["type"] === "module" ?
+      "esmodule" : getRuntimeLanguage(config.provider.runtime);
+    const extension = constants.runtimeExtensions[runtimeExtensions];
+    const handlerPath = ((handlerSplit.length > 1) ? handlerSplit[0] : handler) + extension
 
     return {
       entryPoint,
@@ -233,7 +235,7 @@ export class Utils {
       })
     });
   }
-  
+
   /*
    * Spawn a Node child process from executable within node_modules/.bin
    * @param command CLI Command - NO ARGS
@@ -257,7 +259,7 @@ export class Utils {
   // public static spawn()
 
   public static spawn(options: ServerlessSpawnOptions): Promise<void> {
-    const { 
+    const {
       command,
       serverless,
       commandArgs,
@@ -277,7 +279,7 @@ export class Utils {
       serverless.cli.log(`Spawning process '${commandName || command} ${commandArgs.join(" ")}'`);
     }
     return new Promise(async (resolve, reject) => {
-      const spawnOptions: SpawnOptions = { 
+      const spawnOptions: SpawnOptions = {
         env,
         stdio: stdio || "inherit",
         cwd: cwd

@@ -34,6 +34,7 @@ export const constants = {
   },
   runtimeExtensions: {
     nodejs: ".js",
+    esmodule: ".mjs",
     python: ".py"
   },
   deployedServiceOptions: {
